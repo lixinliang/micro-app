@@ -1,0 +1,7 @@
+@media only screen and (orientation: landscape) {
+    [micro-splash] {
+        body::after {
+            background-image: url("$image");
+        }
+    }
+}

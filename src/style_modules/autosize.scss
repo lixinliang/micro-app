@@ -1,0 +1,177 @@
+// default is empty string
+link[micro-type] {
+    content: '';
+}
+
+// apple-touch-icon
+link[micro-type*="icon"] {
+    // iPhone or iPod
+    &[micro-type*="iPhone"],
+    &[micro-type*="iPod"] {
+        // iOS ≤ 6
+        &[micro-type*="iOS≤6"] {
+            content: '
+                {
+                    "sizes":"57x57"
+                }
+            ';
+            // retina device
+            @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+                content: '
+                    {
+                        "sizes":"114x114"
+                    }
+                ';
+            }
+        }
+        // iOS ≥ 7
+        &[micro-type*="iOS≥7"] {
+            content: '
+                {
+                    "sizes":"60x60"
+                }
+            ';
+            // retina device
+            @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+                content: '
+                    {
+                        "sizes":"120x120"
+                    }
+                ';
+            }
+        }
+    }
+    // iPad
+    &[micro-type*="iPad"] {
+        // iOS ≤ 6
+        &[micro-type*="iOS≤6"] {
+            content: '
+                {
+                    "sizes":"72x72"
+                }
+            ';
+            // retina device
+            @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+                content: '
+                    {
+                        "sizes":"144x144"
+                    }
+                ';
+            }
+        }
+        // iOS ≥ 7
+        &[micro-type*="iOS≥7"] {
+            content: '
+                {
+                    "sizes":"76x76"
+                }
+            ';
+            // retina device
+            @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+                content: '
+                    {
+                        "sizes":"152x152"
+                    }
+                ';
+            }
+        }
+    }
+}
+
+// apple-touch-startup-image
+link[micro-type*="splash"] {
+    // iPhone or iPod
+    &[micro-type*="iPhone"],
+    &[micro-type*="iPod"] {
+        // default
+        // apple-touch-startup-image-320x460.png
+        content: '
+        {
+            "media":"(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)"
+        }
+        ';
+        // iPhone < 5 retina device
+        // apple-touch-startup-image-640x920.png
+        @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+            content: '
+            {
+                "media":"(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
+            }
+            ';
+            // iPhone 5
+            // apple-touch-startup-image-640x1096.png
+            @media (device-width: 320px) and (device-height: 568px) {
+                content: '
+                {
+                    "media":"(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+                }
+                ';
+            }
+            // iPhone 6
+            // apple-touch-startup-image-750x1294.png
+            @media (device-width: 375px) and (device-height: 667px) {
+                content: '
+                {
+                    "media":"(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+                }
+                ';
+            }
+            // iPhone 6 Plus portrait
+            // apple-touch-startup-image-1242x2148.png
+            @media (device-width: 414px) and (device-height: 736px) {
+                content: '
+                {
+                    "media":"(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+                }
+                ';
+            }
+            // iPhone 6 Plus landscape
+            // apple-touch-startup-image-1182x2208.png
+            @media (device-width: 414px) and (device-height: 736px) and (orientation: landscape) {
+                content: '
+                {
+                    "media":"(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+                }
+                ';
+            }
+        }
+    }
+    // iPad
+    &[micro-type*="iPad"] {
+        // default
+        // non-retina portrait
+        // apple-touch-startup-image-768x1004.png
+        content: '
+        {
+            "media":"(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 1) and (orientation: portrait)"
+        }
+        ';
+        // non-retina landscape
+        // apple-touch-startup-image-748x1024.png
+        @media only screen and (orientation: landscape) {
+            content: '
+            {
+                "media":"(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 1) and (orientation: landscape)"
+            }
+            ';
+        }
+        // retina portrait
+        // apple-touch-startup-image-1536x2008.png
+        @media only screen and (-webkit-min-device-pixel-ratio: 2) {
+            content: '
+            {
+                "media":"(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+            }
+            ';
+            // retina landscape
+            // apple-touch-startup-image-1496x2048.png
+            @media (orientation: landscape) {
+                content: '
+                {
+                    "media":"(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+                }
+                ';
+            }
+        }
+    }
+}

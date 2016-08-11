@@ -11,14 +11,14 @@ if (!microApp) {
     microApp = ciosreateElement('<script micro-app>')::show();
 }
 
-if (userAgent.ios) {
+if (userAgent.is.ios) {
     // Detect the browser
-    if (userAgent.safari) {
+    if (userAgent.is.safari) {
         // It looks like in Safari
-        require('./modules/main')(microApp);
+        require('./modules/main').main(microApp);
     } else if (navigator.standalone) {
         // That means website running in web-app
-        require('./modules/standalone')(microApp);
+        require('./modules/standalone').standalone(microApp);
     } else {
         // Open in other browser
         require('./modules/util').compatible(microApp);
@@ -28,9 +28,6 @@ if (userAgent.ios) {
 }
 
 module.exports = microApp;
-
-// 不能用解构 避免打包不必要的代码
-// window.matchMedia
 
 // add to home screen 的缓存(app-store)
 

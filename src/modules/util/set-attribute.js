@@ -1,10 +1,10 @@
-const proto = Element.prototype;
+const { setAttribute, removeAttribute } = Element.prototype;
 
 exports.setAttribute = function ( attribute, value ) {
     if (value === null) {
-        proto.removeAttribute.call(this, attribute);
+        this::removeAttribute(attribute);
     } else {
-        proto.setAttribute.call(this, attribute, value);
+        this::setAttribute(attribute, value);
     }
     return this;
 };

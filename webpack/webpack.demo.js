@@ -4,7 +4,11 @@ let path = require('path');
 let webpack = require('webpack');
 let extractTextPlugin = require('extract-text-webpack-plugin');
 
+const filename = 'micro-app';
+
 let entry = require('./entry.js');
+let alias = {};
+alias[filename] = path.join(__dirname, `../src/${ filename }.js`);
 
 module.exports = {
     devtool : '#source-map',
@@ -15,9 +19,7 @@ module.exports = {
     },
     extensions : ['.vue', '.js', '.json', '.scss', '.html'],
     resolve : {
-        alias : {
-            'micro-app' : path.join(__dirname, '../src/micro-app.js'),
-        },
+        alias,
     },
     module : {
         loaders : [
@@ -39,13 +41,7 @@ module.exports = {
             },
             {
                 test : /\.scss$/,
-                exclude : /style_modules/,
                 loader : extractTextPlugin.extract('style', 'css?localIdentName=[local]___[hash:base64:5]!autoprefixer?safe=true!sass?sourceMap!'),
-            },
-            {
-                test : /\.scss$/,
-                include : /style_modules/,
-                loaders : ['css', 'autoprefixer', 'sass'],
             },
             {
                 test : /\.js$/,

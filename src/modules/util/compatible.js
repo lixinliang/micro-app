@@ -8,4 +8,4 @@ exports.compatible = function ( microApp ) {
             return this;
         };
     });
-}
+};

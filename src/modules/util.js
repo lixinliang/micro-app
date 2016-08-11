@@ -1,33 +1,32 @@
-//---------- ./_variable.js.js ----------
+//---------- ./_variable.js ----------
 const doc = document;
 const head = doc.head;
-//---------- ./autosize.js.js ----------
-//---------- ./camel2hyphen.js.js ----------
+//---------- ./camel2hyphen.js ----------
 exports.camel2hyphen = function ( string ) {
     return string.replace(/[A-Z]/g, function ( match ) {
         return '-' + match.toLowerCase();
     });
 };
-//---------- ./compatible.js.js ----------
-module.exports = function ( microApp ) {
-    // A fallback of micro-app
+//---------- ./compatible.js ----------
+exports.compatible = function ( microApp ) {
     [
-        'filters',
+        'hash',
+        'filter',
     ].forEach(( methodName ) => {
         microApp[methodName] = function () {
-            console.warn(`micro-app: "${ methodName }" is an empty function if this browser is not Safari or website is opened in standalone mode.`);
+            console.warn(`micro-app: "${ methodName }" is an empty function.`);
             return this;
         };
     });
-}
-//---------- ./create-element.js.js ----------
+};
+//---------- ./create-element.js ----------
 const container = doc.createElement('div');
 
 exports.createElement = function ( html ) {
     container.innerHTML = html;
     return container.firstElementChild;
 };
-//---------- ./define-static-property.js.js ----------
+//---------- ./define-static-property.js ----------
 exports.defineStaticProperty = function ( name, value ) {
     Object.defineProperty(
         this,
@@ -41,63 +40,75 @@ exports.defineStaticProperty = function ( name, value ) {
     );
     return this;
 };
-//---------- ./filters.js.js ----------
+//---------- ./filter.js ----------
 exports.filters = {};
-//---------- ./hide.js.js ----------
-exports.hide = function () {
-    head.removeChild(this);
-    return this;
+//---------- ./hash-listener.js ----------
+exports.hashListener = function ( keys ) {
+
+    let expression = new RegExp(`(^|&)(${ keys.join('|') })=`);
+
+    function check ( url ) {
+        let position = url.indexOf('#');
+        if (position > -1 && position < url.length - 1) {
+            let content = url.substring(position + 1);
+            if (!expression.test(content)) {
+                console.warn('micro-app: "location.hash" is in use to save the params.');
+            }
+        }
+    };
+
+    window.addEventListener('hashchange', ( event ) => {
+        check(event.newURL);
+    });
+
+    // Check at once when website onload
+    {
+        check(location.href);
+    }
 };
-//---------- ./location-hash.js.js ----------
-let hashObject = {};
+//---------- ./hash.js ----------
+let hashStorage = {};
+
+if (location.hash) {
+    let hash = decodeURIComponent(location.hash.substring(1));
+    hash.split('&').forEach(( keyValue ) => {
+        let [ key, value ] = keyValue.split('=');
+        hashStorage[key] = value;
+    });
+}
 
 function update () {
     let result = [];
-    for (let key in hashObject) {
-        let value = hashObject[key];
+    for (let key in hashStorage) {
+        let value = hashStorage[key];
         if (value !== null) {
             result.push(key + '=' + value);
         }
     }
-    let hash = location.hash;
-    result = result.join('&');
-    if (hash !== result) {
-        location.hash = result;
-    }
+    location.hash = encodeURIComponent(result.join('&'));
 }
 
-module.exports = {
-    add ( key, value ) {
-        hashObject[key] = value;
-        update();
-    },
-    remove ( key ) {
-        let value = hashObject[key];
-        if (value === null || value === void 0) {
-            return
-        }
-        hashObject[key] = null;
-        update();
+exports.hash = function ( key, value ) {
+    if (key === void 0) {
+        return hashStorage;
     }
-}
-//---------- ./not-a-function.js.js ----------
-exports.NAF = function ( value ) {
-    return typeof value == 'function' ? NAF(value()) : value;
-};
-//---------- ./on-hash-change-handler.js.js ----------
-let keys = ['redirect-uri', 'default-splash', 'landscape-splash'];
-
-exports.onHashChangeHandler = function ( uri ) {
-    let position = uri.indexOf('#');
-    if (position > -1 && position < uri.length - 1) {
-        let content = uri.substring(position + 1);
-        let expression = new RegExp(`(^|&)(${ keys.join('|') })=`);
-        if (!expression.test(content)) {
-            console.warn('micro-app: "location.hash" is in use to save the params.');
-        }
+    if (value === void 0) {
+        return hashStorage[key];
     }
+    hashStorage[key] = value;
+    update();
+    return this;
 };
-//---------- ./parse-argument.js.js ----------
+//---------- ./hide.js ----------
+exports.hide = function () {
+    head.removeChild(this);
+    return this;
+};
+//---------- ./not-a-function.js ----------
+exports.NaF = function ( value ) {
+    return typeof value == 'function' ? NaF(value()) : value;
+};
+//---------- ./parse-argument.js ----------
 exports.parseArgument = function ( expression ) {
     let left = /\(/.test(expression);
     let right = /\)/.test(expression);
@@ -125,59 +136,40 @@ exports.parseArgument = function ( expression ) {
         return [expression, []];
     }
 };
-//---------- ./parse-filters.js.js ----------
-exports.parseFilters = function ( expression ) {
-    let globalFilters = this.globalFilters;
-    if (globalFilters !== void 0) {
-        if (typeof globalFilters == 'string') {
-            return [globalFilters].concat(expression.substring(1).split('|'));
-        }
-        if (globalFilters instanceof Array) {
-            let result = [];
-            let tips = false;
-            globalFilters.forEach(( filter ) => {
-                if (typeof filter == 'string') {
-                    result.push(filter);
-                } else {
-                    if (!tips) {
-                        console.warn(`micro-app: All members in globalFilters will be ignored except String.`);
-                        tips = true;
-                    }
-                }
-            });
-            return result.concat(expression.substring(1).split('|'));
-        }
-        console.warn(`micro-app: globalFilters must be String or an array of String.`);
-    }
+//---------- ./parse-filter.js ----------
+exports.parseFilter = function ( expression ) {
     return expression ? expression.substring(1).split('|') : [];
 };
-//---------- ./parse-url.js.js ----------
+//---------- ./parse-url.js ----------
 exports.parseUrl = function ( url ) {
     let a = doc.createElement('a');
     a.href = url;
     return a;
 };
-//---------- ./set-attribute.js.js ----------
-const proto = Element.prototype;
+//---------- ./set-attribute.js ----------
+const { setAttribute, removeAttribute } = Element.prototype;
 
 exports.setAttribute = function ( attribute, value ) {
     if (value === null) {
-        proto.removeAttribute.call(this, attribute);
+        this::removeAttribute(attribute);
     } else {
-        proto.setAttribute.call(this, attribute, value);
+        this::setAttribute(attribute, value);
     }
     return this;
 };
-//---------- ./show.js.js ----------
+//---------- ./show.js ----------
 exports.show = function () {
     head.appendChild(this);
     return this;
 };
-//---------- ./storage.js.js ----------
-exports.saveData = function ( key, value ) {
-    localStorage.setItem('micro-app:' + key, typeof value == 'string' ? value : JSON.stringify(value));
-};
+//---------- ./user-agent.js ----------
+const userAgent = navigator.userAgent;
 
-exports.loadData = function ( key ) {
-    return localStorage.getItem('micro-app:' + key);
+exports.userAgent = {
+    is : {
+        ios : /\(i[^;]+;( U;)? CPU.+Mac OS X/i.test(userAgent),
+        safari : /\bversion\/([0-9.]+(?: beta)?)(?: mobile(?:\/[a-z0-9]+)?)? safari\//i.test(userAgent),
+    },
+    device : /iPad/i.test(userAgent) ? 'pad' : 'phone',
+    os : parseInt((userAgent.match(/\bcpu(?: iphone)? os /i.test(userAgent) ? /\bcpu(?: iphone)? os ([0-9._]+)/i : /\biph os ([0-9_]+)/i) || [,0])[1]) > 6 ? 7 : 6,
 };

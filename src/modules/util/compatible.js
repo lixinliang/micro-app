@@ -1,5 +1,6 @@
 exports.compatible = function ( microApp ) {
     [
+        'hash',
         'filter',
     ].forEach(( methodName ) => {
         microApp[methodName] = function () {

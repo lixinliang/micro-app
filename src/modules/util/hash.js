@@ -1,4 +1,4 @@
-let hashObject = {};
+let hashStorage = {};
 
 function update () {
     let result = [];
@@ -29,3 +29,7 @@ module.exports = {
         update();
     }
 }
+
+exports.hash = function ( key, value ) {
+
+};

@@ -4,10 +4,10 @@ import {
     // A shortcut to show or hide the tag
     show,
     hide,
-    // Collection of filters
-    filters,
-    // Media query rules
-    autosize,
+    // A shortcut to get or set hash param
+    hash,
+    // Collection of filter
+    filter,
     // A shortcut to parse url
     parseUrl,
     // UserAgent result
@@ -16,8 +16,10 @@ import {
     camel2hyphen,
     // A shortcut to set or remove attribute
     setAttribute,
-    // Extract the filters array from expression
-    parseFilters,
+    // Extract the filter from expression
+    parseFilter,
+    // Listener of hash
+    hashListener,
     // A shortcut to create element
     createElement,
     // Extract the argument from expression
@@ -29,25 +31,19 @@ import {
 // A shortcut to override method
 import { override } from './override';
 
-// A shortcut to set hash of location
-import locationHash from './location-hash';
-
-// A shortcut to create elements
-import { createElements } from './create-elements';
-
 // A shortcut to define property
 import { defineProperty } from './define-property';
 
-// Handler of hashchange
-import { onHashChangeHandler } from './on-hash-change-handler';
-
-// A default value to display
-const defaultArrayValue = Object.prototype.toString.call([]);
+// A shortcut to create multi element
+import { createMultiElement } from './create-multi-element';
 
 exports.main = function ( microApp ) {
 
+    // A default value to display
+    const defaultArrayValue = Object.prototype.toString.call([]);
+
     // Give a warning if `location.hash` is in use
-    addURLHashListener(['href']);
+    hashListener(['href']);
 
     // Define a filter by `microApp.filters`
     microApp
@@ -69,7 +65,7 @@ exports.main = function ( microApp ) {
             if (typeof handler != 'function') {
                 throw new TypeError(`[micro-app] The second argument must be a function.`);
             }
-            filters[name] = handler;
+            filter[name] = handler;
             return this;
         }
     );
@@ -87,34 +83,12 @@ exports.main = function ( microApp ) {
         'autosize',
         function () {
             let type = this.getAttribute('rel') === 'apple-touch-startup-image' ? 'splash' : 'icon';
-            let content = autosize(type);
-            if (content) {
-                let attributes = content[0] === '"' ? JSON.parse(JSON.parse(content)) : JSON.parse(content.slice(1, -1));
+            let attributes = autosize(type);
+            if (attributes) {
                 for (let attributeName in attributes) {
                     this.setAttribute(attributeName, attributes[attributeName]);
                 }
             }
-        }
-    );
-
-    // A filter to mock native splash
-    microApp.filters(
-        'default-splash',
-        function ( duration = 2000 ) {
-            let key = 'default-splash';
-            let value = encodeURIComponent(this.href);
-            locationHash.add(key, value);
-            locationHash.add('duration', duration);
-        }
-    );
-
-    // A filter to mock native landscape splash
-    microApp.filters(
-        'landscape-splash',
-        function () {
-            let key = 'landscape-splash';
-            let value = encodeURIComponent(this.href);
-            locationHash.add(key, value);
         }
     );
 
@@ -168,30 +142,31 @@ exports.main = function ( microApp ) {
     })
     // Icon, the cover of app
     ::defineProperty({
-        name : 'icon',
         result : [],
+        name : 'icon',
+        code : '<link rel="apple-touch-icon">',
         onChange ( value, previous ) {
             // Format to `Array`
             let currentItems = (value instanceof Array) ? value.slice(0) : value === null ? [] : [value];
             let previousItems = this.result;
             // Create or remove the elements
-            this.result = createElements(
+            this.result = createMultiElement(
                 currentItems,
                 previousItems,
                 {
-                    code : '<link rel="apple-touch-icon">',
+                    code : this.code,
                     attribute : 'href',
                     success ( value ) {
                         // Invoke `success` when element is created successfully and pass the `href` as value
                         let interrupt = false;
-                        microApp::parseFilters(parseUrl(value).hash).forEach(( expression ) => {
+                        parseFilter(parseUrl(value).hash).forEach(( expression ) => {
                             if (interrupt || expression === '') {
-                                return
+                                return;
                             }
                             let [ filterName, filterArgument ] = parseArgument(expression);
-                            let method = filters[filterName];
+                            let method = filter[filterName];
                             if (typeof method == 'function') {
-                                interrupt = excludeFunction(method.apply(this, filterArgument)) === false;
+                                interrupt = NaF(method.apply(this, filterArgument)) === false;
                             }
                         });
                     },
@@ -203,30 +178,31 @@ exports.main = function ( microApp ) {
     })
     // Splash, the start up image
     ::defineProperty({
-        name : 'splash',
         result : [],
+        name : 'splash',
+        code : '<link rel="apple-touch-startup-image">',
         onChange ( value, previous ) {
             // Format to `Array`
             let currentItems = (value instanceof Array) ? value.slice(0) : value === null ? [] : [value];
             let previousItems = this.result;
             // Create or remove the elements
-            this.result = createElements(
+            this.result = createMultiElement(
                 currentItems,
                 previousItems,
                 {
-                    code : '<link rel="apple-touch-startup-image">',
+                    code : this.code,
                     attribute : 'href',
                     success ( value ) {
                         // Invoke `success` when element is created successfully and pass the `href` as value
                         let interrupt = false;
-                        microApp::parseFilters(parseUrl(value).hash).forEach(( expression ) => {
+                        parseFilter(parseUrl(value).hash).forEach(( expression ) => {
                             if (interrupt || expression === '') {
-                                return
+                                return;
                             }
                             let [ filterName, filterArgument ] = parseArgument(expression);
-                            let method = filters[filterName];
+                            let method = filter[filterName];
                             if (typeof method == 'function') {
-                                interrupt = excludeFunction(method.apply(this, filterArgument)) === false;
+                                interrupt = NaF(method.apply(this, filterArgument)) === false;
                             }
                         });
                     },
@@ -236,25 +212,12 @@ exports.main = function ( microApp ) {
             microApp::setAttribute(this.name, value instanceof Array ? defaultArrayValue : value);
         },
     })
-    // A shortcut to set manifest, a fallback in offline [Deprecated]
-    // ::defineProperty({
-    //     name : 'manifest',
-    //     onChange ( value, previous ) {
-    //         microApp::setAttribute(this.name, value);
-    //         document.documentElement::setAttribute(this.name, value);
-    //     },
-    // })
     // The website which you want to redirect to
     ::defineProperty({
         name : 'href',
-        alias : 'href',
         onChange ( value, previous ) {
             microApp::setAttribute(this.name, value);
-            if (value === null) {
-                locationHash.remove(this.alias);
-            } else {
-                locationHash.add(this.alias, encodeURIComponent(value));
-            }
+            hash(this.name, value);
         },
     })
     // Override the method `getAttribute`
@@ -289,5 +252,6 @@ exports.main = function ( microApp ) {
                 return this[key] = null;
             }
         },
-    );
+    )
+    ::defineStaticProperty('hash', hash);
 };

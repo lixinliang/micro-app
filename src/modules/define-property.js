@@ -3,7 +3,7 @@ import {
     NaF,
 } from './util';
 
-exports.defineProperty = function defineProperty ( propertyObject ) {
+exports.defineProperty = function ( propertyObject ) {
     // Get defaults from attribute
     let propertyName = propertyObject.name;
     let attributeName = propertyObject.hyphenName || propertyName;
@@ -46,7 +46,7 @@ exports.defineProperty = function defineProperty ( propertyObject ) {
         );
         // Mark down the property name
         defineProperty[propertyName] = defineProperty[attributeName] = true;
-        return this
+        return this;
     }
     // Mark down the property name
     defineProperty[propertyName] = true;

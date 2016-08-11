@@ -10,7 +10,7 @@ import {
     createElement,
 } from './util';
 
-const proto = Element.prototype;
+const { getAttribute } = Element.prototype;
 
 exports.createMultiElement = function ( currentItems, previousItems, config ) {
     // A container to saved the result
@@ -40,7 +40,7 @@ exports.createMultiElement = function ( currentItems, previousItems, config ) {
                 element::setAttribute(attributeName, value);
             }
             // Safari can not parse the img url which is include '#'
-            let originValue = proto.getAttribute.call(element, attributeName);
+            let originValue = element::getAttribute(attributeName);
             element::setAttribute('original-' + attributeName, originValue);
             if (originValue.indexOf('#') > -1) {
                 element::setAttribute(attributeName, originValue.split('#')[0]);

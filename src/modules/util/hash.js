@@ -3,7 +3,12 @@ let hashStorage = {};
 if (location.hash) {
     let hash = decodeURIComponent(location.hash.substring(1));
     hash.split('&').forEach(( keyValue ) => {
-        let [ key, value ] = keyValue.split('=');
+        let temp = keyValue.split('=');
+        let key = temp[0];
+        let value = temp[1];
+        if (value === void 0) {
+            value = '';
+        }
         hashStorage[key] = value;
     });
 }

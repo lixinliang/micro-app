@@ -12,7 +12,9 @@ exports.parseArgument = function ( expression ) {
             if (!/\)$/.test(expression)) {
                 throw new SyntaxError(`[micro-app] Unexpected end of "${ expression.match(/.*(\).*$)/)[1] }".`);
             }
-            let [ , methodName, methodArgument ] = expression.match(/(.*?)\((.*)\)$/);
+            let temp = expression.match(/(.*?)\((.*)\)$/);
+            let methodName = temp[1];
+            let methodArgument = temp[2];
             return [methodName, JSON.parse(`[${ methodArgument }]`)];
         } catch (e) {
             // Function will be stoped cause throw an error sync

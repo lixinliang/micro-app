@@ -8,7 +8,7 @@ if (!microApp) {
         show,
         createElement,
     } = require('./modules/util');
-    microApp = ciosreateElement('<script micro-app>')::show();
+    microApp = createElement('<script micro-app>')::show();
 }
 
 if (userAgent.is.ios) {

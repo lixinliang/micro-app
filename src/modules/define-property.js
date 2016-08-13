@@ -3,7 +3,7 @@ import {
     NaF,
 } from './util';
 
-exports.defineProperty = function ( propertyObject ) {
+exports.defineProperty = function defineProperty ( propertyObject ) {
     // Get defaults from attribute
     let propertyName = propertyObject.name;
     let attributeName = propertyObject.hyphenName || propertyName;

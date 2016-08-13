@@ -6,8 +6,6 @@ import {
     hide,
     // A shortcut to get or set hash param
     hash,
-    // Collection of filter
-    filter,
     // A shortcut to parse url
     parseUrl,
     // UserAgent result
@@ -42,10 +40,12 @@ exports.main = function ( microApp ) {
     // A default value to display
     const defaultArrayValue = Object.prototype.toString.call([]);
 
+    let filterStorage = {};
+
     // Give a warning if `location.hash` is in use
     hashListener(['href']);
 
-    // Define a filter by `microApp.filters`
+    // Define a filter by `microApp.filter`
     microApp
     ::defineStaticProperty(
         'filter',
@@ -65,13 +65,13 @@ exports.main = function ( microApp ) {
             if (typeof handler != 'function') {
                 throw new TypeError(`[micro-app] The second argument must be a function.`);
             }
-            filter[name] = handler;
+            filterStorage[name] = handler;
             return this;
         }
     );
 
     // A filter of `precomposed`
-    microApp.filters(
+    microApp.filter(
         'precomposed',
         function () {
             this.rel = 'apple-touch-icon-precomposed';
@@ -79,7 +79,7 @@ exports.main = function ( microApp ) {
     );
 
     // A filter of `autosize`
-    microApp.filters(
+    microApp.filter(
         'autosize',
         function () {
             let type = this.getAttribute('rel') === 'apple-touch-startup-image' ? 'splash' : 'icon';
@@ -145,72 +145,14 @@ exports.main = function ( microApp ) {
         result : [],
         name : 'icon',
         code : '<link rel="apple-touch-icon">',
-        onChange ( value, previous ) {
-            // Format to `Array`
-            let currentItems = (value instanceof Array) ? value.slice(0) : value === null ? [] : [value];
-            let previousItems = this.result;
-            // Create or remove the elements
-            this.result = createMultiElement(
-                currentItems,
-                previousItems,
-                {
-                    code : this.code,
-                    attribute : 'href',
-                    success ( value ) {
-                        // Invoke `success` when element is created successfully and pass the `href` as value
-                        let interrupt = false;
-                        parseFilter(parseUrl(value).hash).forEach(( expression ) => {
-                            if (interrupt || expression === '') {
-                                return;
-                            }
-                            let [ filterName, filterArgument ] = parseArgument(expression);
-                            let method = filter[filterName];
-                            if (typeof method == 'function') {
-                                interrupt = NaF(method.apply(this, filterArgument)) === false;
-                            }
-                        });
-                    },
-                }
-            );
-            // Set value as attribute
-            microApp::setAttribute(this.name, value instanceof Array ? defaultArrayValue : value);
-        },
+        onChange : onPropertyChange,
     })
     // Splash, the start up image
     ::defineProperty({
         result : [],
         name : 'splash',
         code : '<link rel="apple-touch-startup-image">',
-        onChange ( value, previous ) {
-            // Format to `Array`
-            let currentItems = (value instanceof Array) ? value.slice(0) : value === null ? [] : [value];
-            let previousItems = this.result;
-            // Create or remove the elements
-            this.result = createMultiElement(
-                currentItems,
-                previousItems,
-                {
-                    code : this.code,
-                    attribute : 'href',
-                    success ( value ) {
-                        // Invoke `success` when element is created successfully and pass the `href` as value
-                        let interrupt = false;
-                        parseFilter(parseUrl(value).hash).forEach(( expression ) => {
-                            if (interrupt || expression === '') {
-                                return;
-                            }
-                            let [ filterName, filterArgument ] = parseArgument(expression);
-                            let method = filter[filterName];
-                            if (typeof method == 'function') {
-                                interrupt = NaF(method.apply(this, filterArgument)) === false;
-                            }
-                        });
-                    },
-                }
-            );
-            // Set value as attribute
-            microApp::setAttribute(this.name, value instanceof Array ? defaultArrayValue : value);
-        },
+        onChange : onPropertyChange,
     })
     // The website which you want to redirect to
     ::defineProperty({
@@ -223,7 +165,8 @@ exports.main = function ( microApp ) {
     // Override the method `getAttribute`
     ::override(
         'getAttribute',
-        function ( event, [ key ] ) {
+        function ( event, args ) {
+            let key = args[0];
             if (key in defineProperty) {
                 // This attribute is defined
                 event.stopPropagation();
@@ -234,7 +177,9 @@ exports.main = function ( microApp ) {
     // Override the method `setAttribute`
     ::override(
         'setAttribute',
-        function ( event, [ key, value ] ) {
+        function ( event, args ) {
+            let key = args[0];
+            let value = args[1];
             if (key in defineProperty) {
                 // This attribute is defined
                 event.stopPropagation();
@@ -245,7 +190,8 @@ exports.main = function ( microApp ) {
     // Override the method `removeAttribute`
     ::override(
         'removeAttribute',
-        function ( event, [ key ] ) {
+        function ( event, args ) {
+            let key = args[0];
             if (key in defineProperty) {
                 // This attribute is defined
                 event.stopPropagation();
@@ -254,4 +200,37 @@ exports.main = function ( microApp ) {
         },
     )
     ::defineStaticProperty('hash', hash);
+
+    function onPropertyChange ( value, previous ) {
+        // Format to `Array`
+        let currentItems = (value instanceof Array) ? value.slice(0) : value === null ? [] : [value];
+        let previousItems = this.result;
+        // Create or remove the elements
+        this.result = createMultiElement(
+            currentItems,
+            previousItems,
+            {
+                code : this.code,
+                attribute : 'href',
+                success ( value ) {
+                    // Invoke `success` when element is created successfully and pass the `href` as value
+                    let interrupt = false;
+                    parseFilter(parseUrl(value).hash).forEach(( expression ) => {
+                        if (interrupt || expression === '') {
+                            return;
+                        }
+                        let temp = parseArgument(expression);
+                        let filterName = temp[0];
+                        let filterArgument = temp[1];
+                        let method = filterStorage[filterName];
+                        if (typeof method == 'function') {
+                            interrupt = NaF(method.apply(this, filterArgument)) === false;
+                        }
+                    });
+                },
+            }
+        );
+        // Set value as attribute
+        microApp::setAttribute(this.name, value instanceof Array ? defaultArrayValue : value);
+    }
 };

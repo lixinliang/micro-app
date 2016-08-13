@@ -40,8 +40,6 @@ exports.defineStaticProperty = function ( name, value ) {
     );
     return this;
 };
-//---------- ./filter.js ----------
-exports.filters = {};
 //---------- ./hash-listener.js ----------
 exports.hashListener = function ( keys ) {
 
@@ -72,7 +70,12 @@ let hashStorage = {};
 if (location.hash) {
     let hash = decodeURIComponent(location.hash.substring(1));
     hash.split('&').forEach(( keyValue ) => {
-        let [ key, value ] = keyValue.split('=');
+        let temp = keyValue.split('=');
+        let key = temp[0];
+        let value = temp[1];
+        if (value === void 0) {
+            value = '';
+        }
         hashStorage[key] = value;
     });
 }
@@ -123,7 +126,9 @@ exports.parseArgument = function ( expression ) {
             if (!/\)$/.test(expression)) {
                 throw new SyntaxError(`[micro-app] Unexpected end of "${ expression.match(/.*(\).*$)/)[1] }".`);
             }
-            let [ , methodName, methodArgument ] = expression.match(/(.*?)\((.*)\)$/);
+            let temp = expression.match(/(.*?)\((.*)\)$/);
+            let methodName = temp[1];
+            let methodArgument = temp[2];
             return [methodName, JSON.parse(`[${ methodArgument }]`)];
         } catch (e) {
             // Function will be stoped cause throw an error sync

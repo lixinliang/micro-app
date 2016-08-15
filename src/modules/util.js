@@ -43,7 +43,7 @@ exports.defineStaticProperty = function ( name, value ) {
 //---------- ./hash-listener.js ----------
 exports.hashListener = function ( keys ) {
 
-    let expression = new RegExp(`(^|&)(${ keys.join('|') })=`);
+    let expression = new RegExp(`(^|&)(${ keys.join('|') })${ encodeURIComponent('=') }`);
 
     function check ( url ) {
         let position = url.indexOf('#');

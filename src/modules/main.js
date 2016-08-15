@@ -1,6 +1,6 @@
 import {
     // When the type of value is `function`, return its result
-    NAF,
+    NaF,
     // A shortcut to show or hide the tag
     show,
     hide,
@@ -28,6 +28,9 @@ import {
 
 // A shortcut to override method
 import { override } from './override';
+
+// Autosize about icon and splash
+import { autosize } from './autosize';
 
 // A shortcut to define property
 import { defineProperty } from './define-property';

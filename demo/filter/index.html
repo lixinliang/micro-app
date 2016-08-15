@@ -12,20 +12,25 @@
     <script micro-app src="/micro-app.min.js" capable></script>
     <script type="text/javascript">
         // Your custom filter
-        microApp.filters(
+        microApp.filter(
             'log',
             function () {
                 console.log(this, arguments);
             }
         );
-        // All filters will effect by setting `globalFilters`
-        // `String` or `Array` of `String` are both ok
-        // Inexistent filters will be ignore
-        microApp.globalFilters = 'test';
-        microApp.globalFilters = ['test1', 'test2', 'autosize'];
+        // Return `false` to interrupt the rest filter
+        microApp.filter(
+            'interrupt',
+            function () {
+                if (true) {
+                    console.log('interrupt');
+                    return false;
+                }
+            }
+        );
         // Use filter by hash `#` and split filters by `|` and past the argument by `()`
         // The arguments format like JSON
-        microApp.icon = 'icon.jpg#precomposed|log("test1", "test2")';
+        microApp.icon = 'icon.jpg#precomposed|log("test1", "test2")|interrupt|log("test3", "test4")';
     </script>
     <style>
         html,

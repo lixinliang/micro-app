@@ -19,7 +19,6 @@ export default {
     ready () {
         microApp.capable = true;
         microApp.statusBarStyle = 'black';
-        microApp.globalFilters = 'autosize';
     },
     methods : {
         select ( index ) {
@@ -27,7 +26,7 @@ export default {
                 this.selected = null;
                 this.icon = '';
             } else {
-                this.icon = this.list[index];
+                this.icon = this.list[index] + '#autosize';
                 this.selected = index;
             }
         },

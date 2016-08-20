@@ -65,37 +65,37 @@ Use `Array` and `Object` to set multiple `icon` and `splash`.
 ## Methods
 
 ##### filter(...)
-* Define a filter.
+* Define a filter that filter the url about icon and splash.
 
 |Argument|Description|
-|-|-|
+| - | - |
 |String|filter name|
 |Function|filter handler|
 
 |Return values|
-|-|
+| - |
 |microApp|
 
 ##### hash(...)
 * Get a value by `key` from `location.hash`.
 
 |Argument|Description|
-|-|-|
+| - | - |
 |String|key|
 
 |Return values|
-|-|
+| - |
 |value|
 
 * Set a value by `key` from `location.hash`.
 
 |Argument|Description|
-|-|-|
+| - | - |
 |String|key|
 |String|value|
 
 |Return values|
-|-|
+| - |
 |microApp|
 
 ## Filters

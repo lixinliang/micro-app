@@ -1,7 +1,7 @@
 {
   "name": "micro-app",
   "version": "1.0.0",
-  "description": "[iOS] Create a web app from website anywhere and anytime you want simply.",
+  "description": "[iOS] Integrated Safari features about web app.",
   "main": "dist/micro-app.min.js",
   "scripts": {
     "demo": "node ./webpack/node.demo.js",

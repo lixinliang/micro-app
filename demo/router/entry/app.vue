@@ -40,13 +40,26 @@ export default {
     },
     watch : {
         'title' ( val ) {
-            microApp.title = val;
+            if (val) {
+                microApp.title = val;
+            } else {
+                microApp.title = null;
+            }
         },
         'href' ( val ) {
-            microApp.href = /^http/.test(val) ? val : 'http://' + val;
+            if (val) {
+                microApp.href = /^http/.test(val) ? val : 'http://' + val;
+            } else {
+                microApp.href = null;
+            }
+
         },
         'icon' ( val ) {
-            microApp.icon = val;
+            if (val) {
+                microApp.icon = val;
+            } else {
+                microApp.icon = null;
+            }
         },
     },
 }

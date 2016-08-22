@@ -4,6 +4,12 @@
 ## Getting started
 ```
 $ npm install micro-app
+```
+## Demo
+```
+$ npm cd node_modules
+$ npm cd micro-app
+$ npm install
 $ npm run demo
 ```
 

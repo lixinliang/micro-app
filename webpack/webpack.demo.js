@@ -45,7 +45,7 @@ module.exports = {
             },
             {
                 test : /\.js$/,
-                exclude : /(node_modules|bower_components|dist)/,
+                // exclude : /(node_modules|bower_components|dist)/,
                 // include : path.join(__dirname, './demo/**/entry/'),
                 loader : 'babel',
                 query : {

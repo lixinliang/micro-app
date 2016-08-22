@@ -1,5 +1,6 @@
 'use strict';
 
+let path = require('path');
 let webpack = require('webpack');
 let packageJson = require('../package.json');
 
@@ -35,7 +36,7 @@ module.exports = {
             },
             {
                 test : /\.js$/,
-                // exclude : /(node_modules|bower_components)/,
+                exclude : path.join(__dirname, '../node_modules/'),
                 loader : 'babel',
                 query : {
                     presets : ['es2015', 'stage-0'],

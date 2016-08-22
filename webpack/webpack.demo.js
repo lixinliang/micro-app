@@ -45,8 +45,7 @@ module.exports = {
             },
             {
                 test : /\.js$/,
-                // exclude : /(node_modules|bower_components|dist)/,
-                // include : path.join(__dirname, './demo/**/entry/'),
+                exclude : path.join(__dirname, '../node_modules/'),
                 loader : 'babel',
                 query : {
                     presets : ['es2015', 'stage-0'],

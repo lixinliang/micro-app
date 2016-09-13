@@ -1,5 +1,5 @@
-# micro-app
-> Integrated Safari features about web app.
+# micro-app [Deprecated]
+> Please see [https://github.com/micro-app/micro-app](https://github.com/micro-app/micro-app)]
 
 ## Getting started
 ```
